@@ -17,7 +17,9 @@ require('./src/models/AdminSetting');
 require('./src/models/Product');      // ✅ ADD THIS
 require('./src/models/Category');     // ✅ ADD THIS
 require('./src/models/Category');     // ✅ ADD THIS
+
 console.log('📦 Registered Mongoose models:', Object.keys(mongoose.models));
+
 
 
 // Handle uncaught exceptions
