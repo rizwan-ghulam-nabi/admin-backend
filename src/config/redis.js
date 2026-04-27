@@ -1,41 +1,40 @@
-const redis = require('redis');
+// src/config/redis.js
+const { createClient } = require('redis');
 const logger = require('./logger');
 
-let redisClient;
+let redisClient = null;
 
 const initRedis = async () => {
   try {
-    redisClient = redis.createClient({
+    redisClient = createClient({
       socket: {
         host: process.env.REDIS_HOST || 'localhost',
-        port: process.env.REDIS_PORT || 6379,
+        port: parseInt(process.env.REDIS_PORT) || 6379,
+        reconnectStrategy: (retries) => {
+          // ✅ STOP retrying after 1 attempt
+          if (retries > 1) {
+            logger.warn('⚠️ Redis not available - using memory store');
+            return new Error('Stop retrying');
+          }
+          return 1000;
+        },
       },
-      password: process.env.REDIS_PASSWORD,
-      database: process.env.REDIS_DB || 0,
     });
 
-    redisClient.on('error', (error) => {
-      logger.error('Redis Client Error:', error);
-    });
-
-    redisClient.on('connect', () => {
-      logger.info('Redis Client Connected');
-    });
-
-    redisClient.on('reconnecting', () => {
-      logger.warn('Redis Client Reconnecting');
+    redisClient.on('error', () => {
+      // ✅ Don't log connection refused errors
     });
 
     await redisClient.connect();
+    logger.info('✅ Redis connected');
     return redisClient;
   } catch (error) {
-    logger.error('Redis connection failed:', error);
-    // Don't exit process, just log error
+    // ✅ Silent fail - no more error spam
+    logger.warn('⚠️ Redis not available - using memory store');
     return null;
   }
 };
 
-// Initialize Redis
 initRedis();
 
 module.exports = { redisClient, initRedis };
