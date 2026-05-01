@@ -1,3 +1,4 @@
+
 const mongoose = require('mongoose');
 const slugify = require('slugify');
 
@@ -25,9 +26,9 @@ const productSchema = new mongoose.Schema({
     min: 0
   },
   category: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Category',
-    required: true
+    type: String,  // ✅ Changed from ObjectId to String
+    required: [true, 'Product category is required'],
+    trim: true
   },
   stock: {
     type: Number,

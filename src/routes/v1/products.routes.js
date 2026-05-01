@@ -1,5 +1,4 @@
 
-
 const express = require('express');
 const router = express.Router();
 const productController = require('../../controllers/productController');
@@ -13,15 +12,16 @@ router.get('/', checkPermission('products.view'), productController.getAllProduc
 router.get('/low-stock', checkPermission('products.view'), productController.getLowStockProducts);
 router.get('/:id', checkPermission('products.view'), productController.getProduct);
 
+// ✅ FIXED: Use uploadAny - accepts any field name
 router.post('/', 
   checkPermission('products.create'),
-  upload.uploadMultiple('images', 5), // ✅ Correct - upload is an object
+  upload.uploadAny(5),
   productController.createProduct
 );
 
 router.put('/:id',
   checkPermission('products.update'),
-  upload.uploadMultiple('images', 5), // ✅ Correct
+  upload.uploadAny(5),
   productController.updateProduct
 );
 

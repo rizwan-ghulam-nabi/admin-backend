@@ -1,3 +1,4 @@
+
 const express = require('express');
 const router = express.Router();
 const authController = require('../../controllers/authController');
@@ -16,7 +17,14 @@ router.post('/resend-otp', authValidators.resendOTP, authController.resendOTP); 
 router.post('/verify-2fa-login', authValidators.verify2FALogin, authController.verify2FALogin); // ✅ ADD
 router.post('/refresh-token', authController.refreshToken);
 
+// Forgot Password
+router.post('/forgot-password', authController.forgotPassword);
+
+// Reset Password
+router.post('/reset-password', authController.resetPassword);
+
 // ============================================
+
 // PROTECTED ROUTES (Authentication required)
 // ============================================
 router.use(protect);
@@ -28,5 +36,9 @@ router.put('/profile', authValidators.updateProfile, authController.updateProfil
 router.post('/enable-2fa', authController.enable2FA);
 router.post('/verify-2fa', authValidators.verify2FA, authController.verify2FA);
 router.post('/disable-2fa', authValidators.verify2FA, authController.disable2FA);
+
+
+
+
 
 module.exports = router;

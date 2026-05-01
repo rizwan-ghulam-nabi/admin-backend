@@ -1,242 +1,5 @@
-// const { auditService } = require('../services/auditService');
-// const { cacheService } = require('../services/cacheService');
-// const { emailService } = require('../services/emailService');
-// const axios = require('axios');
-// const { AppError } = require('../utils/AppError');
 
-// const orderController = {
-//   // Get all orders
-//   async getAllOrders(req, res, next) {
-//     try {
-//       const { page = 1, limit = 20, status, paymentStatus, startDate, endDate, search, sort = '-createdAt' } = req.query;
-      
-//       const response = await axios.get(`${process.env.CUSTOMER_API_URL}/orders`, {
-//         params: { page, limit, status, paymentStatus, startDate, endDate, search, sort },
-//         headers: { 'x-api-key': process.env.CUSTOMER_API_KEY }
-//       });
-      
-//       res.status(200).json({
-//         success: true,
-//         data: response.data.data,
-//         pagination: response.data.pagination,
-//       });
-//     } catch (error) {
-//       next(error);
-//     }
-//   },
-  
-//   // Get single order
-//   async getOrder(req, res, next) {
-//     try {
-//       const { id } = req.params;
-      
-//       const response = await axios.get(`${process.env.CUSTOMER_API_URL}/orders/${id}`, {
-//         headers: { 'x-api-key': process.env.CUSTOMER_API_KEY }
-//       });
-      
-//       if (!response.data.data) {
-//         throw new AppError('Order not found', 404);
-//       }
-      
-//       res.status(200).json({
-//         success: true,
-//         data: response.data.data,
-//       });
-//     } catch (error) {
-//       next(error);
-//     }
-//   },
-  
-//   // Update order status
-//   async updateOrderStatus(req, res, next) {
-//     try {
-//       const { id } = req.params;
-//       const { status, note } = req.body;
-      
-//       const response = await axios.patch(`${process.env.CUSTOMER_API_URL}/orders/${id}/status`, 
-//         { status, note },
-//         { headers: { 'x-api-key': process.env.CUSTOMER_API_KEY } }
-//       );
-      
-//       await auditService.log({
-//         admin: req.admin._id,
-//         action: 'update',
-//         resource: 'order',
-//         resourceId: id,
-//         details: { status, note },
-//         ipAddress: req.ip,
-//         userAgent: req.get('user-agent'),
-//       });
-      
-//       // Send email notification if configured
-//       if (response.data.data.userEmail) {
-//         await emailService.sendOrderStatusUpdate(response.data.data.userEmail, {
-//           orderId: id,
-//           status,
-//           note,
-//         });
-//       }
-      
-//       // Clear cache
-//       await cacheService.delPattern(`orders:${id}`);
-      
-//       res.status(200).json({
-//         success: true,
-//         data: response.data.data,
-//         message: `Order status updated to ${status}`,
-//       });
-//     } catch (error) {
-//       next(error);
-//     }
-//   },
-  
-//   // Update payment status
-//   async updatePaymentStatus(req, res, next) {
-//     try {
-//       const { id } = req.params;
-//       const { paymentStatus, transactionId } = req.body;
-      
-//       const response = await axios.patch(`${process.env.CUSTOMER_API_URL}/orders/${id}/payment`, 
-//         { paymentStatus, transactionId },
-//         { headers: { 'x-api-key': process.env.CUSTOMER_API_KEY } }
-//       );
-      
-//       await auditService.log({
-//         admin: req.admin._id,
-//         action: 'update',
-//         resource: 'order',
-//         resourceId: id,
-//         details: { paymentStatus, transactionId },
-//         ipAddress: req.ip,
-//         userAgent: req.get('user-agent'),
-//       });
-      
-//       res.status(200).json({
-//         success: true,
-//         data: response.data.data,
-//         message: `Payment status updated to ${paymentStatus}`,
-//       });
-//     } catch (error) {
-//       next(error);
-//     }
-//   },
-  
-//   // Cancel order
-//   async cancelOrder(req, res, next) {
-//     try {
-//       const { id } = req.params;
-//       const { reason } = req.body;
-      
-//       const response = await axios.post(`${process.env.CUSTOMER_API_URL}/orders/${id}/cancel`, 
-//         { reason },
-//         { headers: { 'x-api-key': process.env.CUSTOMER_API_KEY } }
-//       );
-      
-//       await auditService.log({
-//         admin: req.admin._id,
-//         action: 'update',
-//         resource: 'order',
-//         resourceId: id,
-//         details: { action: 'cancel', reason },
-//         ipAddress: req.ip,
-//         userAgent: req.get('user-agent'),
-//       });
-      
-//       res.status(200).json({
-//         success: true,
-//         data: response.data.data,
-//         message: 'Order cancelled successfully',
-//       });
-//     } catch (error) {
-//       next(error);
-//     }
-//   },
-  
-//   // Generate invoice
-//   async generateInvoice(req, res, next) {
-//     try {
-//       const { id } = req.params;
-      
-//       const response = await axios.get(`${process.env.CUSTOMER_API_URL}/orders/${id}/invoice`, {
-//         headers: { 'x-api-key': process.env.CUSTOMER_API_KEY },
-//         responseType: 'stream'
-//       });
-      
-//       res.setHeader('Content-Type', 'application/pdf');
-//       res.setHeader('Content-Disposition', `attachment; filename=invoice-${id}.pdf`);
-      
-//       response.data.pipe(res);
-//     } catch (error) {
-//       next(error);
-//     }
-//   },
-  
-//   // Get order statistics
-//   async getOrderStats(req, res, next) {
-//     try {
-//       const { period = 'month' } = req.query;
-      
-//       const response = await axios.get(`${process.env.CUSTOMER_API_URL}/orders/stats`, {
-//         params: { period },
-//         headers: { 'x-api-key': process.env.CUSTOMER_API_KEY }
-//       });
-      
-//       res.status(200).json({
-//         success: true,
-//         data: response.data.data,
-//       });
-//     } catch (error) {
-//       next(error);
-//     }
-//   },
-  
-//   // Bulk update orders
-//   async bulkUpdateOrders(req, res, next) {
-//     try {
-//       const { orderIds, status, note } = req.body;
-      
-//       const response = await axios.post(`${process.env.CUSTOMER_API_URL}/orders/bulk-update`,
-//         { orderIds, status, note },
-//         { headers: { 'x-api-key': process.env.CUSTOMER_API_KEY } }
-//       );
-      
-//       await auditService.log({
-//         admin: req.admin._id,
-//         action: 'update',
-//         resource: 'order',
-//         details: { bulk: true, count: orderIds.length, status, note },
-//         ipAddress: req.ip,
-//         userAgent: req.get('user-agent'),
-//       });
-      
-//       res.status(200).json({
-//         success: true,
-//         data: response.data.data,
-//         message: `${orderIds.length} orders updated successfully`,
-//       });
-//     } catch (error) {
-//       next(error);
-//     }
-//   },
-// };
-
-// module.exports = orderController;
-
-
-
-
-
-
-
-
-
-
-
-
-
-/// 24/04/2026
-
-
+/// 30/04/2026
 
 
 const { auditService } = require('../services/auditService');
@@ -248,32 +11,47 @@ const Revenue = require('../models/Revenue'); // ✅ Import Revenue model
 const logger = require('../config/logger');
 
 const orderController = {
-  // Get all orders
-  async getAllOrders(req, res, next) {
-    try {
-      const { page = 1, limit = 20, status, paymentStatus, startDate, endDate, search, sort = '-createdAt' } = req.query;
-      
-      const response = await axios.get(`${process.env.CUSTOMER_API_URL}/orders`, {
-        params: { page, limit, status, paymentStatus, startDate, endDate, search, sort },
-        headers: { 'x-api-key': process.env.CUSTOMER_API_KEY }
-      });
-      
-      res.status(200).json({
-        success: true,
-        data: response.data.data,
-        pagination: response.data.pagination,
-      });
-    } catch (error) {
-      next(error);
-    }
-  },
-  
+
+
+// In admin-backend/src/controllers/orderController.js
+// admin-backend/src/controllers/orderController.js
+async getAllOrders(req, res, next) {
+  try {
+    const { page = 1, limit = 20, status, paymentStatus, startDate, endDate, search, sort = '-createdAt' } = req.query;
+    
+    // ✅ Use /orders/admin/all (matches main backend route)
+    const url = `${process.env.CUSTOMER_API_URL}/orders/admin/all`;
+    
+    console.log('🔍 Calling:', url);
+    
+    const response = await axios.get(url, {
+      params: { page, limit, status, paymentStatus, startDate, endDate, search, sort },
+      headers: { 
+        'x-api-key': process.env.CUSTOMER_API_KEY,
+      }
+    });
+    
+    console.log('✅ Success');
+    
+    res.status(200).json({
+      success: true,
+      data: response.data.data || response.data,
+      pagination: response.data.pagination,
+    });
+  } catch (error) {
+    console.error('❌ Error:', error.message);
+    res.status(200).json({ success: true, data: [] });
+  }
+},
+
+
+
   // Get single order
   async getOrder(req, res, next) {
     try {
       const { id } = req.params;
       
-      const response = await axios.get(`${process.env.CUSTOMER_API_URL}/orders/${id}`, {
+     const response = await axios.get(`${process.env.CUSTOMER_API_URL}/orders/admin/all?id=${id}`,  {
         headers: { 'x-api-key': process.env.CUSTOMER_API_KEY }
       });
       
@@ -296,7 +74,7 @@ const orderController = {
       const { id } = req.params;
       const { status, note } = req.body;
       
-      const response = await axios.patch(`${process.env.CUSTOMER_API_URL}/orders/${id}/status`, 
+      const response = await axios.patch(`${process.env.CUSTOMER_API_URL}/orders/admin/${id}/status`,  
         { status, note },
         { headers: { 'x-api-key': process.env.CUSTOMER_API_KEY } }
       );
@@ -387,7 +165,7 @@ const orderController = {
       const { id } = req.params;
       const { paymentStatus, transactionId } = req.body;
       
-      const response = await axios.patch(`${process.env.CUSTOMER_API_URL}/orders/${id}/payment`, 
+      const response = await axios.post(`${process.env.CUSTOMER_API_URL}/orders/admin/${id}/cancel`, 
         { paymentStatus, transactionId },
         { headers: { 'x-api-key': process.env.CUSTOMER_API_KEY } }
       );

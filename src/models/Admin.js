@@ -19,6 +19,11 @@ const adminSchema = new mongoose.Schema({
     required: true,
     minlength: 8,
   },
+
+  // for reset password
+   resetPasswordToken: String,
+  resetPasswordExpire: Date,
+  
   role: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'AdminRole',
