@@ -305,19 +305,6 @@ if (redisClient && redisClient.isReady) {
 /* =========================================================
    Security & Global Middleware
 ========================================================= */
-// app.use(helmet({
-//   contentSecurityPolicy: {
-//     directives: {
-//       defaultSrc: ["'self'"],
-//       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
-//       fontSrc: ["'self'", "https://fonts.gstatic.com"],
-//       imgSrc: ["'self'", "data:", "https:"],
-//       scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
-//       connectSrc: ["'self'", process.env.FRONTEND_URL || 'http://localhost:3000'],
-//     },
-//   },
-//   crossOriginEmbedderPolicy: false,
-// }));
 
 app.use(helmet({
   contentSecurityPolicy: {
